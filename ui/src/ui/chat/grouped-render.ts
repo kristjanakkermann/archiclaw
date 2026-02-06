@@ -1,8 +1,10 @@
 import { html, nothing } from "lit";
+import { ref } from "lit/directives/ref.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import type { AssistantIdentity } from "../assistant-identity.ts";
 import type { MessageGroup } from "../types/chat-types.ts";
 import { toSanitizedMarkdownHtml } from "../markdown.ts";
+import { containsMermaid, processMermaidInContainer } from "../mermaid.ts";
 import { renderCopyAsMarkdownButton } from "./copy-as-markdown.ts";
 import {
   extractTextCached,
@@ -241,6 +243,7 @@ function renderGroupedMessage(
   const reasoningMarkdown = extractedThinking ? formatReasoningMarkdown(extractedThinking) : null;
   const markdown = markdownBase;
   const canCopyMarkdown = role === "assistant" && Boolean(markdown?.trim());
+  const hasMermaid = !opts.isStreaming && markdown != null && containsMermaid(markdown);
 
   const bubbleClasses = [
     "chat-bubble",
@@ -272,7 +275,15 @@ function renderGroupedMessage(
       }
       ${
         markdown
-          ? html`<div class="chat-text">${unsafeHTML(toSanitizedMarkdownHtml(markdown))}</div>`
+          ? html`<div class="chat-text" ${
+              hasMermaid
+                ? ref((el) => {
+                    if (el) {
+                      requestAnimationFrame(() => processMermaidInContainer(el as HTMLElement));
+                    }
+                  })
+                : nothing
+            }>${unsafeHTML(toSanitizedMarkdownHtml(markdown))}</div>`
           : nothing
       }
       ${toolCards.map((card) => renderToolCardSidebar(card, onOpenSidebar))}

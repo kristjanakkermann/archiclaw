@@ -1,7 +1,9 @@
 import { html } from "lit";
+import { ref } from "lit/directives/ref.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import { icons } from "../icons.ts";
 import { toSanitizedMarkdownHtml } from "../markdown.ts";
+import { processMermaidInContainer } from "../mermaid.ts";
 
 export type MarkdownSidebarProps = {
   content: string | null;
@@ -29,7 +31,11 @@ export function renderMarkdownSidebar(props: MarkdownSidebarProps) {
               </button>
             `
             : props.content
-              ? html`<div class="sidebar-markdown">${unsafeHTML(toSanitizedMarkdownHtml(props.content))}</div>`
+              ? html`<div class="sidebar-markdown" ${ref((el) => {
+                  if (el) {
+                    requestAnimationFrame(() => processMermaidInContainer(el as HTMLElement));
+                  }
+                })}>${unsafeHTML(toSanitizedMarkdownHtml(props.content))}</div>`
               : html`
                   <div class="muted">No content available</div>
                 `

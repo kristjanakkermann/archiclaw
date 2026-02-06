@@ -1,0 +1,252 @@
+/* =============================================
+   MERMAID DIAGRAM RENDERING
+   Beautiful EA-themed diagram containers with
+   loading states, export actions, and fullscreen.
+   ============================================= */
+
+/* --- Container --- */
+
+.mermaid-container {
+  margin: 12px 0;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--card);
+  overflow: hidden;
+  transition:
+    border-color var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out);
+}
+
+.mermaid-container:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-md);
+}
+
+/* --- Loading state --- */
+
+.mermaid-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 32px 16px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.mermaid-loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: mermaid-spin 0.8s linear infinite;
+}
+
+@keyframes mermaid-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* --- Rendered diagram --- */
+
+.mermaid-rendered {
+  position: relative;
+}
+
+.mermaid-svg-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 20px 16px;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.mermaid-svg-wrap svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Action buttons --- */
+
+.mermaid-actions {
+  display: flex;
+  gap: 4px;
+  padding: 6px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--bg-accent);
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-out);
+}
+
+.mermaid-container:hover .mermaid-actions {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .mermaid-actions {
+    opacity: 1;
+  }
+}
+
+.mermaid-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--muted);
+  font-size: 12px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.mermaid-action-btn:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+  background: var(--bg-hover);
+}
+
+.mermaid-action-btn svg {
+  flex-shrink: 0;
+}
+
+/* --- Error state --- */
+
+.mermaid-error {
+  padding: 16px;
+}
+
+.mermaid-error-label {
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--danger);
+  margin-bottom: 6px;
+}
+
+.mermaid-error-message {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.mermaid-error-source {
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  overflow-x: auto;
+  margin: 0;
+}
+
+.mermaid-error-source code {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--text);
+}
+
+/* --- Fullscreen overlay --- */
+
+.mermaid-fullscreen-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: mermaid-overlay-in 200ms var(--ease-out);
+}
+
+@keyframes mermaid-overlay-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.mermaid-fullscreen-content {
+  position: relative;
+  max-width: 95vw;
+  max-height: 95vh;
+  overflow: auto;
+  background: var(--card);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-xl);
+  animation: mermaid-content-in 250ms var(--ease-spring);
+}
+
+@keyframes mermaid-content-in {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.mermaid-fullscreen-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 1;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--muted);
+  cursor: pointer;
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.mermaid-fullscreen-close:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.mermaid-fullscreen-diagram {
+  display: flex;
+  justify-content: center;
+  padding: 40px 32px;
+}
+
+.mermaid-fullscreen-diagram svg {
+  max-width: 100%;
+  height: auto;
+}
+
+/* --- Light mode adjustments --- */
+
+:root[data-theme="light"] .mermaid-container {
+  box-shadow: var(--shadow-sm);
+}
+
+:root[data-theme="light"] .mermaid-container:hover {
+  box-shadow: var(--shadow-md);
+}
+
+:root[data-theme="light"] .mermaid-error-source {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+:root[data-theme="light"] .mermaid-fullscreen-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
