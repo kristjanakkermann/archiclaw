@@ -1,0 +1,30 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "archiclaw-agent",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-02-13",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": { "directory": "public" },
+  "durable_objects": {
+    "bindings": [{ "name": "ArchiClawChat", "class_name": "ArchiClawChat" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ArchiClawChat"] }],
+  "vars": {
+    "MODEL": "gpt-4o",
+    "ENVIRONMENT": "production",
+  },
+  "env": {
+    "staging": {
+      "name": "archiclaw-agent-staging",
+      "vars": {
+        "MODEL": "gpt-4o-mini",
+        "ENVIRONMENT": "staging",
+      },
+    },
+  },
+  "observability": { "enabled": true },
+  // Secrets (set via `wrangler secret put`):
+  // - OPENAI_API_KEY: OpenAI API key for the AI model
+  // - TEAMS_WEBHOOK_SECRET: HMAC secret for Teams webhook verification
+  // - AUTH_TOKEN (optional): bearer token for agent/chat route authentication
+}

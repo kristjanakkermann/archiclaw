@@ -1,0 +1,14 @@
+application: FIN-APP-001
+entities:
+  CORE-ENT-001:
+    operations: [R, U]
+    role: consumer
+  CORE-ENT-002:
+    operations: [M, C, R, U, D]
+    role: master
+  CORE-ENT-003:
+    operations: [M, C, R, U, D]
+    role: master
+  CORE-ENT-004:
+    operations: [M, C, R, U, D]
+    role: master

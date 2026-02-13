@@ -1,0 +1,9 @@
+id: HR
+name: Human Resources
+description: People management, payroll, talent acquisition, and workforce planning
+lead: "VP People"
+capabilities:
+  - HR-CAP-001
+  - HR-CAP-002
+applications:
+  - HR-APP-001

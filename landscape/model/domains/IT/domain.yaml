@@ -1,0 +1,7 @@
+id: IT
+name: IT Operations
+description: Infrastructure, platform services, monitoring, and DevOps tooling
+lead: "CTO Office"
+capabilities:
+  - IT-CAP-001
+applications: []

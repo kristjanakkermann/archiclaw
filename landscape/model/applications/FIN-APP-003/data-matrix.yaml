@@ -1,0 +1,8 @@
+application: FIN-APP-003
+entities:
+  CORE-ENT-002:
+    operations: [R]
+    role: consumer
+  CORE-ENT-003:
+    operations: [R]
+    role: consumer

@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ArchiClaw - Enterprise Architecture Advisor</title>
+    <!-- NOTE: agents version in importmap must match package.json "agents" dependency -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@19.1.0",
+          "react-dom/client": "https://esm.sh/react-dom@19.1.0/client",
+          "agents/ai-react": "https://esm.sh/agents@0.0.74/ai-react"
+        }
+      }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --bg: #fafbfc;
+        --surface: #ffffff;
+        --border: #e1e4e8;
+        --text: #24292f;
+        --text-muted: #57606a;
+        --accent: #4a90d9;
+        --accent-light: #b5d8ff;
+        --user-bg: #4a90d9;
+        --user-text: #ffffff;
+        --assistant-bg: #f6f8fa;
+        --code-bg: #f0f2f5;
+        --sidebar-bg: #f6f8fa;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+      }
+
+      .sidebar {
+        width: 260px;
+        background: var(--sidebar-bg);
+        border-right: 1px solid var(--border);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        overflow-y: auto;
+        flex-shrink: 0;
+      }
+
+      .sidebar h1 {
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sidebar h1 .icon {
+        font-size: 22px;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+      }
+
+      .stat-card .value {
+        font-size: 22px;
+        font-weight: 700;
+        color: var(--accent);
+      }
+
+      .stat-card .label {
+        font-size: 11px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .sidebar-section {
+        margin-top: 8px;
+      }
+      .sidebar-section h3 {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+
+      .suggestion-btn {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 8px 10px;
+        margin-bottom: 4px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        color: var(--text);
+        transition: border-color 0.15s;
+      }
+      .suggestion-btn:hover {
+        border-color: var(--accent);
+      }
+
+      .main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .messages {
+        flex: 1;
+        overflow-y: auto;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .message {
+        max-width: 720px;
+        line-height: 1.55;
+        font-size: 14px;
+      }
+
+      .message.user {
+        align-self: flex-end;
+        background: var(--user-bg);
+        color: var(--user-text);
+        padding: 10px 16px;
+        border-radius: 16px 16px 4px 16px;
+      }
+
+      .message.assistant {
+        align-self: flex-start;
+        background: var(--assistant-bg);
+        padding: 14px 18px;
+        border-radius: 4px 16px 16px 16px;
+        border: 1px solid var(--border);
+      }
+
+      .message.assistant pre {
+        background: var(--code-bg);
+        padding: 12px;
+        border-radius: 6px;
+        overflow-x: auto;
+        margin: 8px 0;
+        font-size: 12px;
+      }
+
+      .message.assistant code {
+        font-family: "SF Mono", "Fira Code", monospace;
+        font-size: 12px;
+      }
+
+      .message.assistant p {
+        margin: 6px 0;
+      }
+
+      .mermaid-container {
+        margin: 12px 0;
+        padding: 16px;
+        background: #ffffff;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow-x: auto;
+      }
+
+      .mermaid-container svg {
+        max-width: 100%;
+        height: auto;
+      }
+
+      .input-area {
+        padding: 16px 24px;
+        border-top: 1px solid var(--border);
+        background: var(--surface);
+      }
+
+      .input-row {
+        display: flex;
+        gap: 10px;
+        max-width: 720px;
+      }
+
+      .input-row input {
+        flex: 1;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
+      .input-row input:focus {
+        border-color: var(--accent);
+      }
+
+      .input-row button {
+        padding: 10px 20px;
+        background: var(--accent);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: opacity 0.15s;
+      }
+      .input-row button:hover {
+        opacity: 0.9;
+      }
+      .input-row button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .loading-dots::after {
+        content: "";
+        animation: dots 1.2s steps(4, end) infinite;
+      }
+      @keyframes dots {
+        0% {
+          content: "";
+        }
+        25% {
+          content: ".";
+        }
+        50% {
+          content: "..";
+        }
+        75% {
+          content: "...";
+        }
+      }
+
+      @media (max-width: 768px) {
+        .sidebar {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="module">
+      import React from "react";
+      import { createRoot } from "react-dom/client";
+      import { useAgentChat } from "agents/ai-react";
+
+      const { createElement: h, useState, useEffect, useRef, useCallback } = React;
+
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: "base",
+        themeVariables: {
+          primaryColor: "#B5D8FF",
+          primaryBorderColor: "#4A90D9",
+          primaryTextColor: "#333333",
+          secondaryColor: "#FFFFB5",
+          tertiaryColor: "#C9E7B7",
+          lineColor: "#666666",
+          fontSize: "14px",
+        },
+      });
+
+      const SUGGESTIONS = [
+        "What applications are in the FIN domain?",
+        "Show the passport for FIN-APP-001",
+        "What integrations does SAP ERP have?",
+        "Generate a C4 diagram for FIN-APP-001",
+        "What data entities does HR-APP-001 use?",
+        "Search for SAP across the landscape",
+        "List capabilities in the SALES domain",
+        "Validate the landscape data",
+      ];
+
+      /**
+       * Safely render a mermaid diagram into a container element.
+       * Uses mermaid.render() which returns an SVG string, then parses it
+       * through DOMParser to safely insert it as DOM nodes (no raw innerHTML).
+       */
+      async function renderMermaidSafe(container, source) {
+        try {
+          const id = "mermaid-" + Math.random().toString(36).slice(2, 10);
+          const { svg } = await mermaid.render(id, source);
+          // Parse the SVG through DOMParser for safe DOM insertion
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(svg, "image/svg+xml");
+          const svgEl = doc.documentElement;
+          // Clear container and append parsed SVG element
+          while (container.firstChild) container.removeChild(container.firstChild);
+          container.appendChild(document.importNode(svgEl, true));
+        } catch (e) {
+          console.warn("Mermaid render failed:", e);
+          container.textContent = "Diagram render failed: " + e.message;
+        }
+      }
+
+      function MermaidDiagram({ source }) {
+        const ref = useRef(null);
+        useEffect(() => {
+          if (ref.current && source) {
+            renderMermaidSafe(ref.current, source);
+          }
+        }, [source]);
+        return h("div", { className: "mermaid-container", ref });
+      }
+
+      function MessageContent({ text }) {
+        const parts = [];
+        const lines = text.split("\n");
+        let i = 0;
+        let inCodeBlock = false;
+        let codeLang = "";
+        let codeLines = [];
+
+        while (i < lines.length) {
+          const line = lines[i];
+          if (!inCodeBlock && line.startsWith("```")) {
+            inCodeBlock = true;
+            codeLang = line.slice(3).trim();
+            codeLines = [];
+            i++;
+            continue;
+          }
+          if (inCodeBlock && line.startsWith("```")) {
+            inCodeBlock = false;
+            if (codeLang === "mermaid") {
+              parts.push({ type: "mermaid", content: codeLines.join("\n") });
+            } else {
+              parts.push({ type: "code", lang: codeLang, content: codeLines.join("\n") });
+            }
+            i++;
+            continue;
+          }
+          if (inCodeBlock) {
+            codeLines.push(line);
+            i++;
+            continue;
+          }
+          parts.push({ type: "text", content: line });
+          i++;
+        }
+        if (inCodeBlock) {
+          if (codeLang === "mermaid") {
+            parts.push({ type: "mermaid", content: codeLines.join("\n") });
+          } else {
+            parts.push({ type: "code", lang: codeLang, content: codeLines.join("\n") });
+          }
+        }
+
+        return h(
+          "div",
+          null,
+          ...parts.map((part, idx) => {
+            if (part.type === "mermaid") {
+              return h(MermaidDiagram, { key: idx, source: part.content });
+            }
+            if (part.type === "code") {
+              return h("pre", { key: idx }, h("code", null, part.content));
+            }
+            if (!part.content.trim()) return h("br", { key: idx });
+            if (/^\s*[-*]\s/.test(part.content)) {
+              return h(
+                "div",
+                { key: idx, style: { paddingLeft: "16px" } },
+                "\u2022 " + part.content.replace(/^\s*[-*]\s/, ""),
+              );
+            }
+            if (/^\s*\d+\.\s/.test(part.content)) {
+              return h("div", { key: idx, style: { paddingLeft: "16px" } }, part.content);
+            }
+            return h("p", { key: idx }, part.content);
+          }),
+        );
+      }
+
+      function Sidebar({ onSuggestion, stats }) {
+        return h(
+          "div",
+          { className: "sidebar" },
+          h("h1", null, h("span", { className: "icon" }, "\u{1F3DB}"), "ArchiClaw"),
+          h(
+            "div",
+            { style: { fontSize: "12px", color: "var(--text-muted)" } },
+            "Enterprise Architecture Advisor",
+          ),
+          stats &&
+            h(
+              "div",
+              { className: "stat-grid" },
+              h(
+                "div",
+                { className: "stat-card" },
+                h("div", { className: "value" }, stats.domains),
+                h("div", { className: "label" }, "Domains"),
+              ),
+              h(
+                "div",
+                { className: "stat-card" },
+                h("div", { className: "value" }, stats.applications),
+                h("div", { className: "label" }, "Apps"),
+              ),
+              h(
+                "div",
+                { className: "stat-card" },
+                h("div", { className: "value" }, stats.capabilities),
+                h("div", { className: "label" }, "Capabilities"),
+              ),
+              h(
+                "div",
+                { className: "stat-card" },
+                h("div", { className: "value" }, stats.integrations),
+                h("div", { className: "label" }, "Integrations"),
+              ),
+            ),
+          h(
+            "div",
+            { className: "sidebar-section" },
+            h("h3", null, "Try asking"),
+            ...SUGGESTIONS.map((s, i) =>
+              h(
+                "button",
+                { key: i, className: "suggestion-btn", onClick: () => onSuggestion(s) },
+                s,
+              ),
+            ),
+          ),
+        );
+      }
+
+      function App() {
+        const [stats, setStats] = useState(null);
+        const messagesEndRef = useRef(null);
+
+        const { messages, input, handleInputChange, handleSubmit, isLoading, setInput } =
+          useAgentChat({ agent: "archiclaw-chat" });
+
+        useEffect(() => {
+          fetch("/health")
+            .then((r) => r.json())
+            .then((data) => setStats(data.landscape))
+            .catch(() => {});
+        }, []);
+
+        useEffect(() => {
+          messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+        }, [messages]);
+
+        const handleSuggestion = useCallback(
+          (text) => {
+            setInput(text);
+          },
+          [setInput],
+        );
+
+        return h(
+          "div",
+          { style: { display: "flex", height: "100vh", width: "100%" } },
+          h(Sidebar, { onSuggestion: handleSuggestion, stats }),
+          h(
+            "div",
+            { className: "main" },
+            h(
+              "div",
+              { className: "messages" },
+              messages.length === 0 &&
+                h(
+                  "div",
+                  {
+                    style: {
+                      textAlign: "center",
+                      color: "var(--text-muted)",
+                      marginTop: "40vh",
+                      fontSize: "15px",
+                    },
+                  },
+                  h("div", { style: { fontSize: "36px", marginBottom: "12px" } }, "\u{1F3DB}"),
+                  h("div", null, "Ask me about your enterprise architecture landscape."),
+                  h(
+                    "div",
+                    { style: { fontSize: "12px", marginTop: "4px" } },
+                    "Applications, integrations, data flows, capabilities, and more.",
+                  ),
+                ),
+              ...messages.map((msg) =>
+                h(
+                  "div",
+                  { key: msg.id, className: `message ${msg.role}` },
+                  msg.role === "assistant" ? h(MessageContent, { text: msg.content }) : msg.content,
+                ),
+              ),
+              isLoading &&
+                h(
+                  "div",
+                  { className: "message assistant" },
+                  h("span", { className: "loading-dots" }, "Thinking"),
+                ),
+              h("div", { ref: messagesEndRef }),
+            ),
+            h(
+              "div",
+              { className: "input-area" },
+              h(
+                "form",
+                { className: "input-row", onSubmit: handleSubmit },
+                h("input", {
+                  value: input,
+                  onChange: handleInputChange,
+                  placeholder: "Ask about your architecture landscape...",
+                  disabled: isLoading,
+                }),
+                h("button", { type: "submit", disabled: isLoading || !input.trim() }, "Send"),
+              ),
+            ),
+          ),
+        );
+      }
+
+      createRoot(document.getElementById("root")).render(h(App));
+    </script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+skill: landscape-query
+description: Evaluates landscape search and query accuracy, completeness of results, and quality of cross-references.
+pass_threshold: 0.7
+criteria:
+  - name: accuracy
+    description: Query results match the actual landscape data; no fabricated information
+    weight: 0.35
+  - name: completeness
+    description: All relevant results are returned; nothing significant is missed
+    weight: 0.3
+  - name: references
+    description: Source file paths are provided for all returned data
+    weight: 0.2
+  - name: clarity
+    description: Response is well-structured, concise, and directly answers the question
+    weight: 0.15

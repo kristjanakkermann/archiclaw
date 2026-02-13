@@ -1,0 +1,37 @@
+name: Setup Worker Environment
+description: Install Node + Bun + pnpm, install deps, and bundle landscape data. Requires actions/checkout first.
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 22.x
+        check-latest: true
+
+    - name: Setup Bun
+      uses: oven-sh/setup-bun@v2
+
+    - name: Setup pnpm (corepack retry)
+      shell: bash
+      run: |
+        set -euo pipefail
+        corepack enable
+        for attempt in 1 2 3; do
+          if corepack prepare pnpm@10.23.0 --activate; then
+            pnpm -v
+            exit 0
+          fi
+          echo "corepack prepare failed (attempt $attempt/3). Retrying..."
+          sleep $((attempt * 10))
+        done
+        exit 1
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --frozen-lockfile --filter @archiclaw/agent-worker...
+
+    - name: Bundle landscape data
+      shell: bash
+      run: bun scripts/bundle-landscape.ts

@@ -1,0 +1,9 @@
+id: CORE-ENT-003
+name: Cost Center
+domain: CORE
+description: Organizational cost centers for management accounting and cost allocation
+applications:
+  FIN-APP-001: { operations: [M, C, R, U, D], role: master }
+  FIN-APP-002: { operations: [R], role: consumer }
+  FIN-APP-003: { operations: [R], role: consumer }
+  HR-APP-001: { operations: [R], role: consumer }

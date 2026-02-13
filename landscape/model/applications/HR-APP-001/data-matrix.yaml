@@ -1,0 +1,8 @@
+application: HR-APP-001
+entities:
+  CORE-ENT-001:
+    operations: [M, C, R, U, D]
+    role: master
+  CORE-ENT-005:
+    operations: [M, C, R, U, D]
+    role: master

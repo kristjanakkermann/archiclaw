@@ -1,0 +1,9 @@
+C4Context
+  title System Context - SAP ERP
+
+  System(sap_erp, "SAP ERP", "Core ERP: FI, CO, MM, SD")
+  System_Ext(workday, "Workday HR", "HR and payroll")
+  System_Ext(sap_bpc, "SAP BPC", "Financial planning and consolidation")
+
+  BiRel(sap_erp, workday, "Employee/payroll data", "RFC")
+  Rel(sap_erp, sap_bpc, "Financial actuals", "HANA Views")

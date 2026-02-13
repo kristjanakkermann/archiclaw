@@ -1,0 +1,24 @@
+id: FIN-APP-002
+name: SAP BPC
+domain: FIN
+status: run
+togaf_layer: application
+owners:
+  business: "Jane Doe"
+  technical: "Mike Chen"
+technology:
+  stack: [SAP BPC, HANA DB, MS Excel Add-in]
+  hosting: on-premise
+  data_classification: confidential
+integrations:
+  - target: FIN-APP-001
+    type: database
+    direction: inbound
+    protocol: HANA Views
+compliance: [SOX]
+sla:
+  availability: "99.0%"
+  rpo: "8h"
+  rto: "24h"
+created: "2018-06-01"
+updated: "2024-11-20"

@@ -1,0 +1,16 @@
+skill: interview
+description: Evaluates the PM deep interview skill for completeness, accuracy, and quality of extracted change request data.
+pass_threshold: 0.7
+criteria:
+  - name: completeness
+    description: All required fields in change.yaml are populated (id, title, domain, applications, impact)
+    weight: 0.3
+  - name: accuracy
+    description: Extracted data accurately reflects the interview input; no fabricated information
+    weight: 0.3
+  - name: consistency
+    description: Referenced application IDs and capability IDs exist in the landscape
+    weight: 0.2
+  - name: quality
+    description: Interview notes are clear, professional, and the problem statement is actionable
+    weight: 0.2

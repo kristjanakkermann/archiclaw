@@ -1,0 +1,3 @@
+scenario: Query applications in the FIN domain
+query: "Which applications are in the Finance domain?"
+landscape_snapshot: fixtures/seed-landscape

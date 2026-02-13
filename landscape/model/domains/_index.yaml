@@ -1,0 +1,16 @@
+domains:
+  - id: FIN
+    name: Finance
+    lead: "CFO Office"
+  - id: HR
+    name: Human Resources
+    lead: "VP People"
+  - id: CORE
+    name: Core
+    lead: "Enterprise Architect"
+  - id: SALES
+    name: Sales & Marketing
+    lead: "VP Sales"
+  - id: IT
+    name: IT Operations
+    lead: "CTO Office"

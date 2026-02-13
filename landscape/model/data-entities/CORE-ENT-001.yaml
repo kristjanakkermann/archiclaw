@@ -1,0 +1,7 @@
+id: CORE-ENT-001
+name: Customer
+domain: CORE
+description: Core customer entity representing business accounts and contacts across the enterprise
+applications:
+  SALES-APP-001: { operations: [M, C, R, U, D], role: master }
+  FIN-APP-001: { operations: [R, U], role: consumer }

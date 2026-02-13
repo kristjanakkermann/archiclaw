@@ -75,3 +75,10 @@ USER.md
 memory/
 .agent/*.json
 !.agent/workflows/
+
+# entire.io personal overrides
+.entire/settings.local.json
+
+# Cloudflare Worker build artifacts
+workers/archiclaw-agent/src/landscape-data.json
+workers/archiclaw-agent/.dev.vars

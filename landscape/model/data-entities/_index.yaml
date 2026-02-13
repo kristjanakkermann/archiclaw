@@ -1,0 +1,16 @@
+entities:
+  - id: CORE-ENT-001
+    name: Customer
+    domain: CORE
+  - id: CORE-ENT-002
+    name: General Ledger
+    domain: CORE
+  - id: CORE-ENT-003
+    name: Cost Center
+    domain: CORE
+  - id: CORE-ENT-004
+    name: Purchase Order
+    domain: CORE
+  - id: CORE-ENT-005
+    name: Employee
+    domain: CORE
