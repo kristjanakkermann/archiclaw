@@ -1,0 +1,28 @@
+id: FIN-APP-001
+name: SAP ERP
+domain: FIN
+status: run
+togaf_layer: application
+owners:
+  business: "Jane Doe"
+  technical: "John Smith"
+technology:
+  stack: [SAP ABAP, HANA DB, Java]
+  hosting: on-premise
+  data_classification: confidential
+integrations:
+  - target: HR-APP-001
+    type: api
+    direction: bidirectional
+    protocol: RFC
+  - target: FIN-APP-002
+    type: database
+    direction: outbound
+    protocol: HANA Views
+compliance: [GDPR, SOX]
+sla:
+  availability: "99.5%"
+  rpo: "4h"
+  rto: "8h"
+created: "2020-03-15"
+updated: "2025-01-10"

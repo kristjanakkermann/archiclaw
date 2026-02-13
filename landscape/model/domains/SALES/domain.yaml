@@ -1,0 +1,9 @@
+id: SALES
+name: Sales & Marketing
+description: Customer acquisition, CRM, campaign management, and revenue operations
+lead: ""
+capabilities:
+  - SALES-CAP-001
+  - SALES-CAP-002
+applications:
+  - SALES-APP-001

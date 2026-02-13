@@ -1,0 +1,7 @@
+C4Context
+  title System Context - TM1 Planning
+
+  System(tm1, "TM1 Planning", "Operational planning tool")
+  System_Ext(sap_erp, "SAP ERP", "Core ERP system")
+
+  Rel(sap_erp, tm1, "Actuals data", "CSV nightly batch")

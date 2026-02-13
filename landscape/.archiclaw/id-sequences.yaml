@@ -1,0 +1,19 @@
+FIN:
+  APP: 3
+  ACR: 0
+  CAP: 3
+HR:
+  APP: 2
+  ACR: 0
+  CAP: 2
+CORE:
+  ENT: 5
+  CAP: 2
+SALES:
+  APP: 1
+  ACR: 0
+  CAP: 2
+IT:
+  APP: 1
+  ACR: 0
+  CAP: 1

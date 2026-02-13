@@ -1,0 +1,46 @@
+organization: Example Corp
+default_domain: CORE
+domains:
+  - id: FIN
+    name: Finance
+    description: Financial management and accounting systems
+  - id: HR
+    name: Human Resources
+    description: People management, payroll, and talent systems
+  - id: CORE
+    name: Core
+    description: Cross-cutting enterprise capabilities
+  - id: SALES
+    name: Sales & Marketing
+    description: Customer acquisition and revenue management
+  - id: IT
+    name: IT Operations
+    description: Infrastructure and platform services
+
+decision_tiers:
+  eac:
+    name: Enterprise Architecture Council
+    description: High-impact changes requiring full council review
+    criteria:
+      min_affected_systems: 3
+      min_cost: high
+      data_sensitivity: [confidential, restricted]
+  peer:
+    name: Peer Review
+    description: Medium-impact changes requiring peer architect review
+    criteria:
+      min_affected_systems: 2
+      min_cost: medium
+  individual:
+    name: Individual Decision
+    description: Low-impact changes within a single domain
+    criteria:
+      max_affected_systems: 1
+      max_cost: low
+
+archimate_colors:
+  business: "#FFFFB5"
+  application: "#B5D8FF"
+  technology: "#C9E7B7"
+  motivation: "#CCCCFF"
+  strategy: "#F5DEAA"

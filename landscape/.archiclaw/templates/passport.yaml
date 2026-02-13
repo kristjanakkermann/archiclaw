@@ -1,0 +1,20 @@
+id: "{DOMAIN}-APP-{NNN}"
+name: ""
+domain: "{DOMAIN}"
+status: plan
+togaf_layer: application
+owners:
+  business: ""
+  technical: ""
+technology:
+  stack: []
+  hosting: on-premise
+  data_classification: internal
+integrations: []
+compliance: []
+sla:
+  availability: ""
+  rpo: ""
+  rto: ""
+created: "{DATE}"
+updated: "{DATE}"

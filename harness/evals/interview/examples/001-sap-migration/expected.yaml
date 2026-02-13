@@ -1,0 +1,25 @@
+change:
+  title: "Migrate SAP ERP to S/4HANA Cloud"
+  domain: FIN
+  status: draft
+  applications:
+    primary: FIN-APP-001
+    affected: [HR-APP-001, FIN-APP-003]
+  impact:
+    cost: high
+    risk: high
+    data_sensitivity: confidential
+    affected_systems_count: 3
+    recommended_tier: eac
+  decision_tier: eac
+
+expected_fields:
+  - change.yaml must have all required fields populated
+  - interview.md must contain the Q&A exchange
+  - problem.md must reference SAP ECC 6.0 end of maintenance
+  - objective.md must mention cloud migration and timeline
+
+validation:
+  - All referenced application IDs must exist in the landscape
+  - Impact scoring must reflect high cost + high risk + 3 systems = EAC tier
+  - Compliance must include SOX and GDPR

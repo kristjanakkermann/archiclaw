@@ -1,0 +1,21 @@
+scenario: SAP ERP to S/4HANA Cloud Migration
+domain: FIN
+pm_responses:
+  - question: "What change are you proposing?"
+    answer: "We need to migrate our on-premise SAP ERP to S/4HANA Cloud. The current system is reaching end of maintenance in 2027."
+  - question: "Why is this change needed now?"
+    answer: "SAP is ending mainstream maintenance for ECC 6.0. We need to plan the migration before the deadline."
+  - question: "Why can't you extend maintenance?"
+    answer: "Extended maintenance costs 2% more per year and doesn't include new features. The business wants the cloud capabilities."
+  - question: "Why does the business need cloud capabilities specifically?"
+    answer: "Real-time analytics, better integration APIs, and reduced infrastructure management overhead."
+  - question: "Which other systems will be affected?"
+    answer: "The HR system (Workday) has an RFC integration for payroll data. Also our financial reporting tool depends on SAP data extracts."
+  - question: "What data entities are involved?"
+    answer: "Employee, General Ledger, Cost Center, Purchase Order - these are all mastered in SAP today."
+  - question: "What is the expected cost?"
+    answer: "High - this is a multi-million dollar program over 18 months."
+  - question: "What is the risk level?"
+    answer: "High - SAP is our core financial system. Any disruption impacts the entire organization."
+  - question: "Are there compliance implications?"
+    answer: "Yes, SOX compliance for financial controls must be maintained throughout migration. GDPR for employee data in Workday integration."

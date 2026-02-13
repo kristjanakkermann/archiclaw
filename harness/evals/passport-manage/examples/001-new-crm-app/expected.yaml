@@ -1,0 +1,17 @@
+passport:
+  id: "SALES-APP-002" # Next available SALES-APP ID
+  name: "HubSpot CRM"
+  domain: SALES
+  status: build
+  togaf_layer: application
+  technology:
+    hosting: saas
+    data_classification: confidential
+
+validation:
+  - passport.yaml must validate against ApplicationPassportSchema
+  - Folder name must match the assigned ID
+  - _index.yaml must be updated with new entry
+  - domain.yaml for SALES must include the new app ID
+  - context.mmd must be generated showing SAP ERP integration
+  - data-matrix.yaml must exist (can be empty initially)

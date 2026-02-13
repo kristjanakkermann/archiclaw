@@ -1,0 +1,7 @@
+id: CORE-ENT-005
+name: Employee
+domain: CORE
+description: Employee master data including personal information, contracts, and organizational assignment
+applications:
+  HR-APP-001: { operations: [M, C, R, U, D], role: master }
+  FIN-APP-001: { operations: [R], role: consumer }

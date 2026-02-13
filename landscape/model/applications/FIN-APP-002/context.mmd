@@ -1,0 +1,7 @@
+C4Context
+  title System Context - SAP BPC
+
+  System(sap_bpc, "SAP BPC", "Financial planning and consolidation")
+  System_Ext(sap_erp, "SAP ERP", "Core ERP system")
+
+  Rel(sap_erp, sap_bpc, "Financial actuals", "HANA Views")

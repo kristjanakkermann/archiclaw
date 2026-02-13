@@ -1,0 +1,9 @@
+C4Context
+  title System Context - Workday HR
+
+  System(workday, "Workday HR", "HCM: Core HR, Payroll, Talent")
+  System_Ext(sap_erp, "SAP ERP", "Core ERP system")
+  System_Ext(recruit, "Recruitment Platform", "Talent acquisition")
+
+  BiRel(workday, sap_erp, "Payroll/employee data", "RFC")
+  Rel(workday, recruit, "Job requisitions", "REST API")

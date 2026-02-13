@@ -1,0 +1,31 @@
+integrations:
+  - source: FIN-APP-001
+    target: HR-APP-001
+    type: api
+    direction: bidirectional
+    protocol: RFC
+    description: Employee and payroll data exchange between SAP ERP and Workday
+  - source: FIN-APP-001
+    target: FIN-APP-002
+    type: database
+    direction: outbound
+    protocol: HANA Views
+    description: Financial actuals from SAP ERP to BPC for planning
+  - source: FIN-APP-001
+    target: FIN-APP-003
+    type: file
+    direction: outbound
+    protocol: CSV Extract
+    description: Nightly batch extract of actuals to TM1 Planning
+  - source: SALES-APP-001
+    target: FIN-APP-001
+    type: api
+    direction: outbound
+    protocol: REST
+    description: Sales order creation in SAP ERP from Salesforce
+  - source: HR-APP-001
+    target: HR-APP-002
+    type: api
+    direction: outbound
+    protocol: REST
+    description: Job requisitions from Workday to recruitment platform

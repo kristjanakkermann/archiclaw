@@ -1,0 +1,28 @@
+id: HR-APP-001
+name: Workday HR
+domain: HR
+status: run
+togaf_layer: application
+owners:
+  business: "Lisa HR Director"
+  technical: "Tom DevOps"
+technology:
+  stack: [Workday, Workday Studio, EIB]
+  hosting: saas
+  data_classification: confidential
+integrations:
+  - target: FIN-APP-001
+    type: api
+    direction: bidirectional
+    protocol: RFC
+  - target: HR-APP-002
+    type: api
+    direction: outbound
+    protocol: REST
+compliance: [GDPR]
+sla:
+  availability: "99.7%"
+  rpo: "1h"
+  rto: "4h"
+created: "2019-01-15"
+updated: "2025-01-05"

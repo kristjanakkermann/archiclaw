@@ -1,0 +1,24 @@
+id: FIN-APP-003
+name: TM1 Planning
+domain: FIN
+status: run
+togaf_layer: application
+owners:
+  business: "Jane Doe"
+  technical: "Alex Wong"
+technology:
+  stack: [IBM TM1, MS Excel, TurboIntegrator]
+  hosting: on-premise
+  data_classification: internal
+integrations:
+  - target: FIN-APP-001
+    type: file
+    direction: inbound
+    protocol: CSV Extract
+compliance: [SOX]
+sla:
+  availability: "95.0%"
+  rpo: "24h"
+  rto: "48h"
+created: "2015-09-01"
+updated: "2024-06-15"

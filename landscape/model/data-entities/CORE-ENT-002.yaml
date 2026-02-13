@@ -1,0 +1,8 @@
+id: CORE-ENT-002
+name: General Ledger
+domain: CORE
+description: General ledger accounts and postings for financial accounting
+applications:
+  FIN-APP-001: { operations: [M, C, R, U, D], role: master }
+  FIN-APP-002: { operations: [R], role: consumer }
+  FIN-APP-003: { operations: [R], role: consumer }

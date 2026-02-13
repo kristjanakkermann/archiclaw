@@ -1,0 +1,8 @@
+application: SALES-APP-001
+entities:
+  CORE-ENT-001:
+    operations: [M, C, R, U, D]
+    role: master
+  CORE-ENT-004:
+    operations: [C, R]
+    role: producer

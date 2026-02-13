@@ -1,0 +1,16 @@
+applications:
+  - id: FIN-APP-001
+    name: SAP ERP
+    domain: FIN
+  - id: FIN-APP-002
+    name: SAP BPC
+    domain: FIN
+  - id: FIN-APP-003
+    name: TM1 Planning
+    domain: FIN
+  - id: HR-APP-001
+    name: Workday HR
+    domain: HR
+  - id: SALES-APP-001
+    name: Salesforce CRM
+    domain: SALES

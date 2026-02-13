@@ -1,0 +1,24 @@
+id: SALES-APP-001
+name: Salesforce CRM
+domain: SALES
+status: run
+togaf_layer: application
+owners:
+  business: "Mark Sales VP"
+  technical: "Sarah CloudOps"
+technology:
+  stack: [Salesforce, Apex, Lightning]
+  hosting: saas
+  data_classification: confidential
+integrations:
+  - target: FIN-APP-001
+    type: api
+    direction: outbound
+    protocol: REST
+compliance: [GDPR]
+sla:
+  availability: "99.9%"
+  rpo: "1h"
+  rto: "4h"
+created: "2017-06-01"
+updated: "2025-01-08"

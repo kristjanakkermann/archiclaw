@@ -1,0 +1,12 @@
+id: FIN
+name: Finance
+description: Financial management, accounting, treasury, and reporting systems
+lead: ""
+capabilities:
+  - FIN-CAP-001
+  - FIN-CAP-002
+  - FIN-CAP-003
+applications:
+  - FIN-APP-001
+  - FIN-APP-002
+  - FIN-APP-003

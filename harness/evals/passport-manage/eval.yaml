@@ -1,0 +1,16 @@
+skill: passport-manage
+description: Evaluates application passport creation and update operations for schema compliance, completeness, and diagram generation.
+pass_threshold: 0.7
+criteria:
+  - name: completeness
+    description: All required passport fields are populated with meaningful values
+    weight: 0.3
+  - name: schema_compliance
+    description: Generated passport.yaml validates against ApplicationPassportSchema
+    weight: 0.3
+  - name: consistency
+    description: ID matches folder name, domain exists, integration targets are valid
+    weight: 0.2
+  - name: diagram_quality
+    description: Context diagram is generated and includes all known integrations
+    weight: 0.2

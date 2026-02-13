@@ -1,0 +1,7 @@
+id: CORE-ENT-004
+name: Purchase Order
+domain: CORE
+description: Purchase orders for procurement and vendor management
+applications:
+  FIN-APP-001: { operations: [M, C, R, U, D], role: master }
+  SALES-APP-001: { operations: [C, R], role: producer }

@@ -1,0 +1,13 @@
+expected_applications:
+  - id: FIN-APP-001
+    name: SAP ERP
+  - id: FIN-APP-002
+    name: SAP BPC
+  - id: FIN-APP-003
+    name: TM1 Planning
+
+validation:
+  - Response must list all 3 FIN domain applications
+  - Each application must include its ID and name
+  - Response must reference landscape/model/domains/FIN/domain.yaml as source
+  - Response must not include applications from other domains

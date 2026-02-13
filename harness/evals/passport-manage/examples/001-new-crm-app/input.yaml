@@ -1,0 +1,24 @@
+scenario: Create a new CRM application passport
+operation: create
+domain: SALES
+data:
+  name: "HubSpot CRM"
+  status: build
+  togaf_layer: application
+  owners:
+    business: "Sarah Marketing"
+    technical: "Dev Lead Mike"
+  technology:
+    stack: [Node.js, React, PostgreSQL]
+    hosting: saas
+    data_classification: confidential
+  integrations:
+    - target: FIN-APP-001
+      type: api
+      direction: outbound
+      protocol: REST
+  compliance: [GDPR]
+  sla:
+    availability: "99.9%"
+    rpo: "1h"
+    rto: "4h"

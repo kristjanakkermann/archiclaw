@@ -1,0 +1,61 @@
+capabilities:
+  - id: FIN-CAP-001
+    name: Financial Accounting
+    domain: FIN
+    description: General ledger, accounts payable/receivable, and asset accounting
+    level: 1
+    children: []
+  - id: FIN-CAP-002
+    name: Management Accounting
+    domain: FIN
+    description: Cost center accounting, profitability analysis, and internal orders
+    level: 1
+    children: []
+  - id: FIN-CAP-003
+    name: Financial Planning
+    domain: FIN
+    description: Budgeting, forecasting, and financial consolidation
+    level: 1
+    children: []
+  - id: HR-CAP-001
+    name: Core HR Management
+    domain: HR
+    description: Employee lifecycle, organizational management, and personnel administration
+    level: 1
+    children: []
+  - id: HR-CAP-002
+    name: Payroll Processing
+    domain: HR
+    description: Payroll calculation, tax reporting, and payment execution
+    level: 1
+    children: []
+  - id: SALES-CAP-001
+    name: Customer Relationship Management
+    domain: SALES
+    description: Sales pipeline, opportunity management, and customer engagement
+    level: 1
+    children: []
+  - id: SALES-CAP-002
+    name: Order Management
+    domain: SALES
+    description: Order capture, fulfillment tracking, and invoicing
+    level: 1
+    children: []
+  - id: CORE-CAP-001
+    name: Master Data Management
+    domain: CORE
+    description: Cross-domain master data governance for customers, vendors, and materials
+    level: 0
+    children: []
+  - id: CORE-CAP-002
+    name: Integration Platform
+    domain: CORE
+    description: Enterprise integration bus and API management
+    level: 0
+    children: []
+  - id: IT-CAP-001
+    name: Infrastructure Management
+    domain: IT
+    description: Server provisioning, network management, and cloud operations
+    level: 0
+    children: []

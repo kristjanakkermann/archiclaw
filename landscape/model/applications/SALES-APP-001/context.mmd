@@ -1,0 +1,7 @@
+C4Context
+  title System Context - Salesforce CRM
+
+  System(sfdc, "Salesforce CRM", "Sales pipeline and customer management")
+  System_Ext(sap_erp, "SAP ERP", "Core ERP system")
+
+  Rel(sfdc, sap_erp, "Sales orders", "REST API")

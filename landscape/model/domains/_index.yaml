@@ -1,0 +1,16 @@
+domains:
+  - id: FIN
+    name: Finance
+    lead: ""
+  - id: HR
+    name: Human Resources
+    lead: ""
+  - id: CORE
+    name: Core
+    lead: ""
+  - id: SALES
+    name: Sales & Marketing
+    lead: ""
+  - id: IT
+    name: IT Operations
+    lead: ""

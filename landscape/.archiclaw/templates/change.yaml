@@ -1,0 +1,24 @@
+id: "{DOMAIN}-ACR-{NNN}"
+title: ""
+domain: "{DOMAIN}"
+status: draft
+created: "{DATE}"
+author: ""
+applications:
+  primary: ""
+  affected: []
+capabilities_affected: []
+impact:
+  cost: low
+  risk: low
+  data_sensitivity: internal
+  affected_systems_count: 0
+  recommended_tier: individual
+decision_tier: individual
+artifacts:
+  diagrams: []
+  data_matrix: ""
+  adr: ""
+push:
+  jira_issue: ""
+  confluence_page: ""
