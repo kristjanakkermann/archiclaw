@@ -72,3 +72,5 @@ export type { IntegrationEntry, IntegrationRegistry } from "./integration.js";
 
 export { AdrStatusSchema, AdrMetadataSchema } from "./adr.js";
 export type { AdrMetadata } from "./adr.js";
+
+export { expandTemplate } from "./templates.js";

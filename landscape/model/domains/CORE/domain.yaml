@@ -1,7 +1,7 @@
 id: CORE
 name: Core
 description: Cross-cutting enterprise capabilities shared across domains
-lead: ""
+lead: "Enterprise Architect"
 capabilities:
   - CORE-CAP-001
   - CORE-CAP-002

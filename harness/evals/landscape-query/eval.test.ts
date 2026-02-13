@@ -1,3 +1,4 @@
+// Tests validate eval definition structure and example data, not skill execution.
 import { readFileSync, existsSync } from "node:fs";
 import { join } from "node:path";
 import { describe, it, expect } from "vitest";
@@ -6,7 +7,7 @@ import { loadEvalDefinition, computeWeightedScore } from "../../runner.js";
 
 const EVAL_DIR = import.meta.dirname ?? new URL(".", import.meta.url).pathname;
 
-describe("landscape-query skill eval", () => {
+describe("landscape-query eval fixtures", () => {
   const evalDef = loadEvalDefinition("landscape-query");
 
   it("has valid eval definition with criteria", () => {

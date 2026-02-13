@@ -11,7 +11,7 @@
  */
 
 import { readFileSync, writeFileSync, mkdirSync, existsSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 import { parse } from "yaml";
 
 const HARNESS_DIR = import.meta.dirname ?? new URL(".", import.meta.url).pathname;
@@ -168,7 +168,10 @@ export function generateReport(): EvalReport {
 }
 
 // CLI entrypoint
-if (import.meta.url === `file://${process.argv[1]}` || process.argv[1]?.endsWith("runner.ts")) {
+const isMain =
+  import.meta.url === `file://${process.argv[1]}` ||
+  (process.argv[1] != null && resolve(process.argv[1]) === join(HARNESS_DIR, "runner.ts"));
+if (isMain) {
   const args = process.argv.slice(2);
   const skillFlag = args.indexOf("--skill");
   const reportFlag = args.includes("--report");

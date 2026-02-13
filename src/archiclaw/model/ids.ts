@@ -63,7 +63,11 @@ export function formatId(domain: string, type: EntityType, sequence: number): st
 // Not all entity types are required per domain
 export const IdSequencesSchema = z.record(
   DomainIdSchema,
-  z.record(z.string(), z.number().int().nonnegative()),
+  z
+    .record(z.string(), z.number().int().nonnegative())
+    .refine((obj) => Object.keys(obj).every((k) => EntityTypeSchema.safeParse(k).success), {
+      message: "Keys must be valid entity types: APP, ACR, ENT, CAP",
+    }),
 );
 
 export type IdSequences = z.infer<typeof IdSequencesSchema>;
@@ -74,8 +78,14 @@ export type IdSequences = z.infer<typeof IdSequencesSchema>;
  */
 export function readIdSequences(landscapePath: string): IdSequences {
   const filePath = join(landscapePath, ".archiclaw", "id-sequences.yaml");
-  const raw = readFileSync(filePath, "utf-8");
-  return IdSequencesSchema.parse(parse(raw));
+  try {
+    const raw = readFileSync(filePath, "utf-8");
+    return IdSequencesSchema.parse(parse(raw));
+  } catch (err) {
+    throw new Error(
+      `Failed to read ID sequences from ${filePath}: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 }
 
 /**
@@ -83,12 +93,22 @@ export function readIdSequences(landscapePath: string): IdSequences {
  */
 export function writeIdSequences(landscapePath: string, sequences: IdSequences): void {
   const filePath = join(landscapePath, ".archiclaw", "id-sequences.yaml");
-  writeFileSync(filePath, stringify(sequences), "utf-8");
+  try {
+    writeFileSync(filePath, stringify(sequences), "utf-8");
+  } catch (err) {
+    throw new Error(
+      `Failed to write ID sequences to ${filePath}: ${err instanceof Error ? err.message : String(err)}`,
+    );
+  }
 }
 
 /**
  * Allocate the next sequential ID for a given domain and entity type.
  * Reads, increments, writes, and returns the new ID.
+ *
+ * TODO: read-modify-write race condition — concurrent callers can allocate
+ * the same sequence number. Add file locking (e.g. proper-lockfile) before
+ * using this in any multi-process or multi-agent context.
  */
 export function nextId(landscapePath: string, domain: string, type: EntityType): string {
   const sequences = readIdSequences(landscapePath);

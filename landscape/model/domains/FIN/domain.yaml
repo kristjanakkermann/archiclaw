@@ -1,7 +1,7 @@
 id: FIN
 name: Finance
 description: Financial management, accounting, treasury, and reporting systems
-lead: ""
+lead: "CFO Office"
 capabilities:
   - FIN-CAP-001
   - FIN-CAP-002

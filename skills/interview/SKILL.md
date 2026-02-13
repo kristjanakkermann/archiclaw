@@ -66,6 +66,14 @@ During the interview, always reference existing landscape data:
 - Review affected capabilities in `landscape/model/capabilities/_index.yaml`
 - Look up data entities in `landscape/model/data-entities/`
 
+## Diagram Generation
+
+After the interview, generate architecture diagrams:
+
+```bash
+bun src/archiclaw/render/cli.ts current-vs-target --title "{CHANGE_TITLE}" --current current.yaml --target target.yaml --out landscape/changes/{ID}/diagrams/arch-change.svg
+```
+
 ## Guardrails
 
 - Never fabricate landscape data; always read from the actual files

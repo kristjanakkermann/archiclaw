@@ -68,6 +68,20 @@ Use the `c4ContextTemplate()` helper from `src/archiclaw/render/mermaid.ts`.
 - Data matrices: `landscape/model/applications/{ID}/data-matrix.yaml`
 - Application registry: `landscape/model/applications/_index.yaml`
 
+## Rendering Diagrams
+
+Generate C4 context diagrams using the render CLI:
+
+```bash
+bun src/archiclaw/render/cli.ts c4 --app "{APP_NAME}" --integrations landscape/model/applications/{ID}/passport.yaml --out landscape/model/applications/{ID}/context.svg
+```
+
+Or render any `.mmd` file:
+
+```bash
+bun src/archiclaw/render/cli.ts render landscape/model/applications/{ID}/context.mmd
+```
+
 ## Guardrails
 
 - Always validate against `ApplicationPassportSchema` before writing
