@@ -15,10 +15,6 @@ integrations:
     type: api
     direction: bidirectional
     protocol: RFC
-  - target: HR-APP-002
-    type: api
-    direction: outbound
-    protocol: REST
 compliance: [GDPR]
 sla:
   availability: "99.7%"

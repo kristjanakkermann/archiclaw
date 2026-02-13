@@ -112,10 +112,7 @@ describe("validateLandscape negative cases", () => {
     );
 
     mkdirSync(join(TMP, "model", "data-entities"), { recursive: true });
-    writeFileSync(
-      join(TMP, "model", "data-entities", "_index.yaml"),
-      stringify({ entities: [] }),
-    );
+    writeFileSync(join(TMP, "model", "data-entities", "_index.yaml"), stringify({ entities: [] }));
 
     mkdirSync(join(TMP, "model", "integrations"), { recursive: true });
     writeFileSync(
@@ -197,6 +194,78 @@ describe("validateLandscape negative cases", () => {
     writeFileSync(
       join(TMP, ".archiclaw", "id-sequences.yaml"),
       stringify({ TST: { APP: 1, ACR: 1, CAP: 0 } }),
+    );
+
+    const result = validateLandscape(TMP);
+    const warnings = result.issues.filter(
+      (i) => i.severity === "warning" && i.message.includes("TST-APP-999"),
+    );
+    expect(warnings.length).toBeGreaterThan(0);
+    expect(warnings[0].message).toContain("not found in landscape");
+  });
+
+  it("warns about broken integration target in passport", () => {
+    // Override the passport to have an integration targeting a non-existent app
+    writeFileSync(
+      join(TMP, "model", "applications", "TST-APP-001", "passport.yaml"),
+      stringify({
+        ...passport("TST-APP-001", "TST"),
+        integrations: [
+          { target: "TST-APP-999", type: "api", direction: "outbound", protocol: "REST" },
+        ],
+      }),
+    );
+
+    const result = validateLandscape(TMP);
+    const warnings = result.issues.filter(
+      (i) => i.severity === "warning" && i.message.includes("TST-APP-999"),
+    );
+    expect(warnings.length).toBeGreaterThan(0);
+    expect(warnings[0].message).toContain("Integration target");
+  });
+
+  it("warns about broken application reference in domain", () => {
+    // Override domain to reference a non-existent app
+    writeFileSync(
+      join(TMP, "model", "domains", "TST", "domain.yaml"),
+      stringify({
+        id: "TST",
+        name: "Test",
+        description: "Test domain",
+        lead: "Tester",
+        capabilities: [],
+        applications: ["TST-APP-001", "TST-APP-999"],
+      }),
+    );
+
+    const result = validateLandscape(TMP);
+    const warnings = result.issues.filter(
+      (i) => i.severity === "warning" && i.message.includes("TST-APP-999"),
+    );
+    expect(warnings.length).toBeGreaterThan(0);
+    expect(warnings[0].message).toContain("not found in landscape");
+  });
+
+  it("warns about broken application reference in data entity", () => {
+    // Add a data entity that references a non-existent app
+    writeFileSync(
+      join(TMP, "model", "data-entities", "TST-ENT-001.yaml"),
+      stringify({
+        id: "TST-ENT-001",
+        name: "Test Entity",
+        domain: "TST",
+        description: "Test data entity",
+        applications: {
+          "TST-APP-001": { operations: ["R"], role: "consumer" },
+          "TST-APP-999": { operations: ["R"], role: "consumer" },
+        },
+      }),
+    );
+
+    // Update id-sequences for entity counter
+    writeFileSync(
+      join(TMP, ".archiclaw", "id-sequences.yaml"),
+      stringify({ TST: { APP: 1, ACR: 0, CAP: 0, ENT: 1 } }),
     );
 
     const result = validateLandscape(TMP);

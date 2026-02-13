@@ -4,5 +4,4 @@ description: Infrastructure, platform services, monitoring, and DevOps tooling
 lead: "CTO Office"
 capabilities:
   - IT-CAP-001
-applications:
-  - IT-APP-001
+applications: []

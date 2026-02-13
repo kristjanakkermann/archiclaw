@@ -230,6 +230,74 @@ export function validateLandscape(landscapePath: string): ValidationResult {
     }
   }
 
+  // Cross-reference: check passport integration targets exist
+  for (const appDir of appDirs) {
+    const passportPath = join(landscapePath, "model", "applications", appDir, "passport.yaml");
+    if (!existsSync(passportPath)) {
+      continue;
+    }
+    try {
+      const data = readYaml(passportPath) as {
+        integrations?: Array<{ target: string }>;
+      };
+      for (const int of data.integrations ?? []) {
+        if (int.target && !allIds.has(int.target)) {
+          issues.push({
+            file: relative(landscapePath, passportPath),
+            message: `Integration target '${int.target}' not found in landscape`,
+            severity: "warning",
+          });
+        }
+      }
+    } catch {
+      // Already reported as schema error
+    }
+  }
+
+  // Cross-reference: check domain application lists reference existing apps
+  for (const domainDir of domainDirs) {
+    const defPath = join(landscapePath, "model", "domains", domainDir, "domain.yaml");
+    if (!existsSync(defPath)) {
+      continue;
+    }
+    try {
+      const data = readYaml(defPath) as { applications?: string[] };
+      for (const appId of data.applications ?? []) {
+        if (appId && !allIds.has(appId)) {
+          issues.push({
+            file: relative(landscapePath, defPath),
+            message: `Referenced application '${appId}' not found in landscape`,
+            severity: "warning",
+          });
+        }
+      }
+    } catch {
+      // Already reported as schema error
+    }
+  }
+
+  // Cross-reference: check data entity application references exist
+  for (const entityFile of entityFiles) {
+    const fullPath = join(landscapePath, "model", "data-entities", entityFile);
+    if (!existsSync(fullPath)) {
+      continue;
+    }
+    try {
+      const data = readYaml(fullPath) as { applications?: Record<string, unknown> };
+      for (const appId of Object.keys(data.applications ?? {})) {
+        if (appId && !allIds.has(appId)) {
+          issues.push({
+            file: relative(landscapePath, fullPath),
+            message: `Referenced application '${appId}' not found in landscape`,
+            severity: "warning",
+          });
+        }
+      }
+    } catch {
+      // Already reported as schema error
+    }
+  }
+
   // Check ID sequence consistency: no allocated ID should exceed the counter
   if (existsSync(seqPath)) {
     try {

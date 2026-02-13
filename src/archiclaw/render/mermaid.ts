@@ -1,7 +1,8 @@
 import type { RenderOptions } from "beautiful-mermaid";
 import { renderMermaid, THEMES } from "beautiful-mermaid";
-import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
-import { dirname } from "node:path";
+import { existsSync, readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { parse } from "yaml";
 
 /**
  * Archimate-aligned color palette for Mermaid diagrams.
@@ -21,6 +22,52 @@ export const ARCHIMATE_COLORS = {
 } as const;
 
 export type ArchimateLayer = keyof typeof ARCHIMATE_COLORS;
+
+export type ArchimateColorEntry = { fill: string; stroke: string; text: string };
+export type ArchimateColorPalette = Record<string, ArchimateColorEntry>;
+
+/** Darken a hex color by a percentage (0-1). */
+function darkenHex(hex: string, amount = 0.3): string {
+  const h = hex.replace("#", "");
+  const r = Math.max(0, Math.round(Number.parseInt(h.slice(0, 2), 16) * (1 - amount)));
+  const g = Math.max(0, Math.round(Number.parseInt(h.slice(2, 4), 16) * (1 - amount)));
+  const b = Math.max(0, Math.round(Number.parseInt(h.slice(4, 6), 16) * (1 - amount)));
+  return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+}
+
+/**
+ * Load archimate colors from landscape config.yaml, merged with defaults.
+ * Config provides layer fill colors; stroke is derived by darkening ~30%.
+ */
+export function loadArchimateColors(landscapePath: string): ArchimateColorPalette {
+  const configPath = join(landscapePath, ".archiclaw", "config.yaml");
+  const palette: ArchimateColorPalette = { ...ARCHIMATE_COLORS };
+
+  if (!existsSync(configPath)) {
+    return palette;
+  }
+
+  try {
+    const config = parse(readFileSync(configPath, "utf-8")) as {
+      archimate_colors?: Record<string, string>;
+    };
+    if (!config.archimate_colors) {
+      return palette;
+    }
+
+    for (const [layer, fill] of Object.entries(config.archimate_colors)) {
+      palette[layer] = {
+        fill,
+        stroke: darkenHex(fill),
+        text: "#333333",
+      };
+    }
+  } catch {
+    // Fall back to defaults on parse error
+  }
+
+  return palette;
+}
 
 /**
  * Archimate-inspired theme for beautiful-mermaid.
@@ -53,13 +100,13 @@ export type PresetTheme = keyof typeof PRESET_THEMES;
  * Generate Mermaid theme directives for Archimate-style diagrams.
  * Embeds theme variables directly in the .mmd source for standalone rendering.
  */
-export function archimateInit(): string {
+export function archimateInit(colors: ArchimateColorPalette = ARCHIMATE_COLORS): string {
   return `%%{init: {'theme': 'base', 'themeVariables': {
-  'primaryColor': '${ARCHIMATE_COLORS.application.fill}',
-  'primaryBorderColor': '${ARCHIMATE_COLORS.application.stroke}',
-  'primaryTextColor': '${ARCHIMATE_COLORS.application.text}',
-  'secondaryColor': '${ARCHIMATE_COLORS.business.fill}',
-  'tertiaryColor': '${ARCHIMATE_COLORS.technology.fill}',
+  'primaryColor': '${colors.application.fill}',
+  'primaryBorderColor': '${colors.application.stroke}',
+  'primaryTextColor': '${colors.application.text}',
+  'secondaryColor': '${colors.business.fill}',
+  'tertiaryColor': '${colors.technology.fill}',
   'lineColor': '#666666',
   'fontSize': '14px'
 }}}%%`;
@@ -68,11 +115,11 @@ export function archimateInit(): string {
 /**
  * Generate Mermaid style class definitions for Archimate layers.
  */
-export function archimateStyles(): string {
+export function archimateStyles(colors: ArchimateColorPalette = ARCHIMATE_COLORS): string {
   const lines: string[] = [];
-  for (const [layer, colors] of Object.entries(ARCHIMATE_COLORS)) {
+  for (const [layer, layerColors] of Object.entries(colors)) {
     lines.push(
-      `classDef ${layer} fill:${colors.fill},stroke:${colors.stroke},color:${colors.text}`,
+      `classDef ${layer} fill:${layerColors.fill},stroke:${layerColors.stroke},color:${layerColors.text}`,
     );
   }
   return lines.join("\n  ");
@@ -157,9 +204,10 @@ export async function renderFile(
 export function c4ContextTemplate(
   appName: string,
   integrations: Array<{ name: string; direction: string }>,
+  colors: ArchimateColorPalette = ARCHIMATE_COLORS,
 ): string {
+  const app = colors.application;
   const lines = [
-    archimateInit(),
     "C4Context",
     `  title System Context - ${appName}`,
     "",
@@ -183,16 +231,36 @@ export function c4ContextTemplate(
     }
   }
 
+  // C4-specific styling (%%{init:} base theme has no effect on C4 diagrams)
+  lines.push("");
+  lines.push(
+    `  UpdateElementStyle(target, $bgColor="${app.fill}", $fontColor="${app.text}", $borderColor="${app.stroke}")`,
+  );
+  for (const int of integrations) {
+    const id = int.name.replace(/\s+/g, "_").toLowerCase();
+    lines.push(
+      `  UpdateElementStyle(${id}, $bgColor="${colors.neutral.fill}", $fontColor="${colors.neutral.text}", $borderColor="${colors.neutral.stroke}")`,
+    );
+  }
+
   return lines.join("\n");
 }
 
 /** Generate a current-vs-target state comparison diagram. */
 export function currentVsTargetTemplate(
-  _title: string,
+  title: string,
   currentNodes: Array<{ id: string; label: string }>,
   targetNodes: Array<{ id: string; label: string }>,
+  colors: ArchimateColorPalette = ARCHIMATE_COLORS,
 ): string {
-  const lines = [archimateInit(), "flowchart LR", `  subgraph current["Current State"]`];
+  const lines = [
+    "---",
+    `title: ${title}`,
+    "---",
+    archimateInit(colors),
+    "flowchart LR",
+    `  subgraph current["Current State"]`,
+  ];
 
   for (const node of currentNodes) {
     lines.push(`    ${node.id}_cur["${node.label}"]:::current`);
@@ -205,7 +273,7 @@ export function currentVsTargetTemplate(
   }
   lines.push("  end");
   lines.push("");
-  lines.push(`  ${archimateStyles()}`);
+  lines.push(`  ${archimateStyles(colors)}`);
 
   return lines.join("\n");
 }

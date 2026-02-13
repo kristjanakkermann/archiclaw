@@ -7,6 +7,7 @@ import {
   wrapWithTheme,
   c4ContextTemplate,
   currentVsTargetTemplate,
+  loadArchimateColors,
   renderSvgString,
   renderToSvg,
   renderFile,
@@ -15,6 +16,8 @@ import {
   ARCHIMATE_THEME,
   PRESET_THEMES,
 } from "./mermaid.js";
+
+const LANDSCAPE_PATH = join(import.meta.dirname ?? ".", "..", "..", "..", "landscape");
 
 const TMP_DIR = join(import.meta.dirname ?? ".", "..", "..", "..", ".tmp-test-render");
 
@@ -62,6 +65,23 @@ describe("mermaid render", () => {
     });
   });
 
+  describe("loadArchimateColors", () => {
+    it("loads colors from the seeded landscape config", () => {
+      const colors = loadArchimateColors(LANDSCAPE_PATH);
+      expect(colors.application.fill).toBe("#B5D8FF");
+      expect(colors.business.fill).toBe("#FFFFB5");
+      expect(colors.technology.fill).toBe("#C9E7B7");
+      // Supplementary colors remain from defaults
+      expect(colors.current.fill).toBe("#E8E8E8");
+      expect(colors.target.fill).toBe("#D4EDDA");
+    });
+
+    it("returns defaults for missing config", () => {
+      const colors = loadArchimateColors("/nonexistent/path");
+      expect(colors).toEqual(ARCHIMATE_COLORS);
+    });
+  });
+
   describe("template generators", () => {
     it("generates C4 context diagram", () => {
       const diagram = c4ContextTemplate("SAP ERP", [
@@ -73,6 +93,9 @@ describe("mermaid render", () => {
       expect(diagram).toContain("System_Ext(workday_hr");
       expect(diagram).toContain("BiRel(target, workday_hr");
       expect(diagram).toContain("Rel(target, sap_bpc");
+      expect(diagram).not.toContain("%%{init:");
+      expect(diagram).toContain("UpdateElementStyle(target");
+      expect(diagram).toContain("UpdateElementStyle(workday_hr");
     });
 
     it("generates current-vs-target diagram", () => {
@@ -81,6 +104,7 @@ describe("mermaid render", () => {
         [{ id: "sap_ecc", label: "SAP ECC 6.0" }],
         [{ id: "s4hana", label: "S/4HANA Cloud" }],
       );
+      expect(diagram).toContain("title: Migration");
       expect(diagram).toContain("flowchart LR");
       expect(diagram).toContain("Current State");
       expect(diagram).toContain("Target State");

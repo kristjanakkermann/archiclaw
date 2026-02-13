@@ -71,10 +71,6 @@ USER.md
 # local tooling
 .serena/
 
-# Cloudflare Worker build artifacts
-workers/archiclaw-agent/src/landscape-data.json
-workers/archiclaw-agent/.dev.vars
-
 # Agent credentials and memory (NEVER COMMIT)
 memory/
 .agent/*.json
