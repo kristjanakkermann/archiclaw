@@ -10,12 +10,14 @@ import { routeAgentRequest } from "agents";
 import { AIChatAgent } from "agents/ai-chat-agent";
 import { streamText } from "ai";
 import { getLandscapeSummary, landscape } from "./landscape-loader.js";
+import { handleTeamsWebhook } from "./teams-webhook.js";
 import { tools } from "./tools.js";
 
 interface Env {
   OPENAI_API_KEY: string;
   MODEL: string;
   ENVIRONMENT: string;
+  TEAMS_WEBHOOK_SECRET: string;
   ArchiClawChat: DurableObjectNamespace;
 }
 
@@ -73,6 +75,10 @@ export default {
         model: env.MODEL,
         landscape: summary.stats,
       });
+    }
+
+    if (url.pathname === "/api/teams/webhook" && request.method === "POST") {
+      return handleTeamsWebhook(request, env);
     }
 
     return (await routeAgentRequest(request, env)) ?? new Response("Not found", { status: 404 });
