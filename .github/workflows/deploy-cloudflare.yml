@@ -1,0 +1,152 @@
+name: Deploy Cloudflare Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "workers/archiclaw-agent/**"
+      - "src/archiclaw/**"
+      - "landscape/**"
+      - "scripts/bundle-landscape.ts"
+  pull_request:
+    paths:
+      - "workers/archiclaw-agent/**"
+      - "src/archiclaw/**"
+      - "landscape/**"
+      - "scripts/bundle-landscape.ts"
+
+concurrency:
+  group: cf-deploy-${{ github.event_name == 'push' && 'production' || format('pr-{0}', github.event.number) }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          check-latest: true
+
+      - name: Setup pnpm (corepack retry)
+        run: |
+          set -euo pipefail
+          corepack enable
+          for attempt in 1 2 3; do
+            if corepack prepare pnpm@10.23.0 --activate; then
+              pnpm -v
+              exit 0
+            fi
+            echo "corepack prepare failed (attempt $attempt/3). Retrying..."
+            sleep $((attempt * 10))
+          done
+          exit 1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter @archiclaw/agent-worker...
+
+      - name: Bundle landscape data
+        run: npx bun scripts/bundle-landscape.ts
+
+      - name: Type check
+        working-directory: workers/archiclaw-agent
+        run: pnpm typecheck
+
+      - name: Test
+        working-directory: workers/archiclaw-agent
+        run: pnpm test
+
+  deploy-production:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          check-latest: true
+
+      - name: Setup pnpm (corepack retry)
+        run: |
+          set -euo pipefail
+          corepack enable
+          for attempt in 1 2 3; do
+            if corepack prepare pnpm@10.23.0 --activate; then
+              pnpm -v
+              exit 0
+            fi
+            echo "corepack prepare failed (attempt $attempt/3). Retrying..."
+            sleep $((attempt * 10))
+          done
+          exit 1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter @archiclaw/agent-worker...
+
+      - name: Bundle landscape data
+        run: npx bun scripts/bundle-landscape.ts
+
+      - name: Deploy to production
+        working-directory: workers/archiclaw-agent
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Smoke test
+        env:
+          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          sleep 5
+          curl -sf "https://archiclaw-agent.${CF_ACCOUNT_ID}.workers.dev/health" | head -c 500
+          echo ""
+
+  deploy-preview:
+    if: github.event_name == 'pull_request'
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+          check-latest: true
+
+      - name: Setup pnpm (corepack retry)
+        run: |
+          set -euo pipefail
+          corepack enable
+          for attempt in 1 2 3; do
+            if corepack prepare pnpm@10.23.0 --activate; then
+              pnpm -v
+              exit 0
+            fi
+            echo "corepack prepare failed (attempt $attempt/3). Retrying..."
+            sleep $((attempt * 10))
+          done
+          exit 1
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile --filter @archiclaw/agent-worker...
+
+      - name: Bundle landscape data
+        run: npx bun scripts/bundle-landscape.ts
+
+      - name: Deploy to staging
+        working-directory: workers/archiclaw-agent
+        run: npx wrangler deploy --env staging
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
