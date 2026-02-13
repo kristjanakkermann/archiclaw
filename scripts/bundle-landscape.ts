@@ -33,6 +33,12 @@ const ROOT = join(import.meta.dirname!, "..");
 const LANDSCAPE = join(ROOT, "landscape");
 const OUTPUT = join(ROOT, "workers", "archiclaw-agent", "src", "landscape-data.json");
 
+if (!existsSync(LANDSCAPE)) {
+  console.error(`Error: landscape directory not found at ${LANDSCAPE}`);
+  console.error("Run from the repository root or ensure landscape/ exists.");
+  process.exit(1);
+}
+
 interface BundleIssue {
   file: string;
   message: string;

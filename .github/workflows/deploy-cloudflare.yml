@@ -23,34 +23,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
-          check-latest: true
-
-      - name: Setup pnpm (corepack retry)
-        run: |
-          set -euo pipefail
-          corepack enable
-          for attempt in 1 2 3; do
-            if corepack prepare pnpm@10.23.0 --activate; then
-              pnpm -v
-              exit 0
-            fi
-            echo "corepack prepare failed (attempt $attempt/3). Retrying..."
-            sleep $((attempt * 10))
-          done
-          exit 1
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter @archiclaw/agent-worker...
-
-      - name: Bundle landscape data
-        run: npx bun scripts/bundle-landscape.ts
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-worker-env
 
       - name: Type check
         working-directory: workers/archiclaw-agent
@@ -66,34 +40,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
-          check-latest: true
-
-      - name: Setup pnpm (corepack retry)
-        run: |
-          set -euo pipefail
-          corepack enable
-          for attempt in 1 2 3; do
-            if corepack prepare pnpm@10.23.0 --activate; then
-              pnpm -v
-              exit 0
-            fi
-            echo "corepack prepare failed (attempt $attempt/3). Retrying..."
-            sleep $((attempt * 10))
-          done
-          exit 1
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter @archiclaw/agent-worker...
-
-      - name: Bundle landscape data
-        run: npx bun scripts/bundle-landscape.ts
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-worker-env
 
       - name: Deploy to production
         working-directory: workers/archiclaw-agent
@@ -104,45 +52,23 @@ jobs:
 
       - name: Smoke test
         env:
-          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CF_WORKER_SUBDOMAIN: ${{ secrets.CF_WORKER_SUBDOMAIN }}
         run: |
           sleep 5
-          curl -sf "https://archiclaw-agent.${CF_ACCOUNT_ID}.workers.dev/health" | head -c 500
-          echo ""
+          if [ -n "${CF_WORKER_SUBDOMAIN:-}" ]; then
+            curl -sf "https://archiclaw-agent.${CF_WORKER_SUBDOMAIN}.workers.dev/health" | head -c 500
+            echo ""
+          else
+            echo "Warning: CF_WORKER_SUBDOMAIN not set, skipping smoke test"
+          fi
 
   deploy-preview:
     if: github.event_name == 'pull_request'
     needs: validate
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22.x
-          check-latest: true
-
-      - name: Setup pnpm (corepack retry)
-        run: |
-          set -euo pipefail
-          corepack enable
-          for attempt in 1 2 3; do
-            if corepack prepare pnpm@10.23.0 --activate; then
-              pnpm -v
-              exit 0
-            fi
-            echo "corepack prepare failed (attempt $attempt/3). Retrying..."
-            sleep $((attempt * 10))
-          done
-          exit 1
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile --filter @archiclaw/agent-worker...
-
-      - name: Bundle landscape data
-        run: npx bun scripts/bundle-landscape.ts
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-worker-env
 
       - name: Deploy to staging
         working-directory: workers/archiclaw-agent

@@ -182,14 +182,15 @@ export const tools = {
         const extSystems = integrations.map((i) => {
           const otherId = i.source === applicationId ? i.target : i.source;
           const otherApp = getApplication(otherId);
-          const dir =
-            i.source === applicationId
-              ? i.direction === "bidirectional"
-                ? "bidirectional"
-                : "outbound"
-              : i.direction === "bidirectional"
-                ? "bidirectional"
-                : "inbound";
+          // Direction is relative to source→target in the integration entry.
+          // When queried app is the target, flip the perspective.
+          const dir = (() => {
+            if (i.direction === "bidirectional") return "bidirectional";
+            if (i.source === applicationId) {
+              return i.direction === "outbound" ? "outbound" : "inbound";
+            }
+            return i.direction === "outbound" ? "inbound" : "outbound";
+          })();
           return { name: otherApp?.name ?? otherId, direction: dir };
         });
 
@@ -241,6 +242,21 @@ export const tools = {
         lines.push(`    ${node.id}_tgt["${node.label}"]:::target`);
       }
       lines.push("  end");
+      lines.push("");
+
+      // Edges: connect current nodes to their matching target nodes
+      for (const curNode of currentNodes) {
+        const matchingTarget = tgtNodes.find((t) => t.id === curNode.id);
+        if (matchingTarget) {
+          lines.push(`  ${curNode.id}_cur -.->|"evolves to"| ${curNode.id}_tgt`);
+        }
+      }
+      // Highlight nodes that only exist in the target (new additions)
+      for (const tgtNode of tgtNodes) {
+        if (!currentNodes.some((c) => c.id === tgtNode.id)) {
+          lines.push(`  new_${tgtNode.id}(("NEW")):::impacted -.-> ${tgtNode.id}_tgt`);
+        }
+      }
       lines.push("");
       lines.push(`  ${archimateStyles()}`);
 

@@ -7,7 +7,8 @@
     "deploy": "wrangler deploy",
     "deploy:staging": "wrangler deploy --env staging",
     "dev": "wrangler dev",
-    "prebuild": "bun ../../scripts/bundle-landscape.ts",
+    "predeploy": "bun ../../scripts/bundle-landscape.ts",
+    "predev": "bun ../../scripts/bundle-landscape.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

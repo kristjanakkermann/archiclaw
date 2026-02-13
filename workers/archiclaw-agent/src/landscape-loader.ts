@@ -3,7 +3,16 @@
  * by scripts/bundle-landscape.ts) and exports typed accessors for use in tools.
  */
 
+import type {
+  ApplicationPassport,
+  Capability,
+  DataEntity,
+  DomainDefinition,
+  IntegrationEntry,
+} from "../../../src/archiclaw/model/index.js";
 import landscapeData from "./landscape-data.json";
+
+export type { ApplicationPassport, Capability, DataEntity, DomainDefinition, IntegrationEntry };
 
 export interface LandscapeStats {
   applications: number;
@@ -16,57 +25,6 @@ export interface LandscapeStats {
 export interface ValidationResult {
   valid: boolean;
   issues: Array<{ file: string; message: string; severity: "error" | "warning" }>;
-}
-
-export interface ApplicationPassport {
-  id: string;
-  name: string;
-  domain: string;
-  status: string;
-  togaf_layer: string;
-  owners: { business: string; technical: string };
-  technology: { stack: string[]; hosting: string; data_classification: string };
-  integrations: Array<{ target: string; type: string; direction: string; protocol: string }>;
-  compliance: string[];
-  sla: { availability: string; rpo: string; rto: string };
-  created: string;
-  updated: string;
-}
-
-export interface DomainDefinition {
-  id: string;
-  name: string;
-  description: string;
-  lead: string;
-  capabilities: string[];
-  applications: string[];
-}
-
-export interface Capability {
-  id: string;
-  name: string;
-  domain: string;
-  description: string;
-  parent?: string;
-  level: number;
-  children: string[];
-}
-
-export interface IntegrationEntry {
-  source: string;
-  target: string;
-  type: string;
-  direction: string;
-  protocol: string;
-  description: string;
-}
-
-export interface DataEntity {
-  id: string;
-  name: string;
-  domain: string;
-  description: string;
-  applications: Record<string, { operations: string[]; role: string }>;
 }
 
 // Double assertion needed because JSON import infers literal key types

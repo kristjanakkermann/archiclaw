@@ -18,6 +18,7 @@ interface Env {
   MODEL: string;
   ENVIRONMENT: string;
   TEAMS_WEBHOOK_SECRET: string;
+  AUTH_TOKEN?: string;
   ArchiClawChat: DurableObjectNamespace;
 }
 
@@ -55,7 +56,9 @@ export class ArchiClawChat extends AIChatAgent<Env> {
       messages: this.messages,
       tools,
       maxSteps: 5,
-      // AIChatAgent's onFinish uses generic ToolSet while streamText narrows to our tools
+      // Known Agents SDK type mismatch: AIChatAgent.onChatMessage exposes a generic
+      // ToolSet-typed onFinish, but streamText narrows it to our concrete tools.
+      // The `as never` is the recommended workaround until the SDK aligns the types.
       onFinish: onFinish as never,
     });
 
@@ -79,6 +82,14 @@ export default {
 
     if (url.pathname === "/api/teams/webhook" && request.method === "POST") {
       return handleTeamsWebhook(request, env);
+    }
+
+    // Require bearer token for agent/chat routes when AUTH_TOKEN is configured
+    if (env.AUTH_TOKEN) {
+      const authHeader = request.headers.get("Authorization");
+      if (!authHeader || authHeader !== `Bearer ${env.AUTH_TOKEN}`) {
+        return new Response("Unauthorized", { status: 401 });
+      }
     }
 
     return (await routeAgentRequest(request, env)) ?? new Response("Not found", { status: 404 });
