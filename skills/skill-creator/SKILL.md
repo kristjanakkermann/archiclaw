@@ -5,9 +5,18 @@ description: Create or update AgentSkills. Use when designing, structuring, or p
 
 # Skill Creator
 
-This skill provides guidance for creating effective skills.
+This skill provides guidance for creating effective skills following the [agentskills.io specification](https://agentskills.io/specification).
 
 ## About Skills
+
+### Specification Reference
+
+Skills follow the [agentskills.io spec](https://agentskills.io/specification). Key constraints:
+- **Body limit**: 5000 tokens maximum for SKILL.md body (keeps context lean)
+- **Progressive disclosure**: metadata always loaded, body on trigger, resources on demand
+- **Frontmatter fields**: `name`, `description`, `license`, `allowed-tools`, `metadata` (no other top-level keys)
+- **Naming**: hyphen-case only (`[a-z0-9-]+`), max 64 characters, no leading/trailing/consecutive hyphens
+- **Description**: max 1024 characters, no angle brackets (`<` or `>`)
 
 Skills are modular, self-contained packages that extend Codex's capabilities by providing
 specialized knowledge, workflows, and tools. Think of them as "onboarding guides" for specific
@@ -318,15 +327,39 @@ If you used `--examples`, delete any placeholder files that are not needed for t
 
 ##### Frontmatter
 
-Write the YAML frontmatter with `name` and `description`:
+Write the YAML frontmatter using the agentskills.io spec fields:
 
-- `name`: The skill name
-- `description`: This is the primary triggering mechanism for your skill, and helps Codex understand when to use the skill.
-  - Include both what the Skill does and specific triggers/contexts for when to use it.
-  - Include all "when to use" information here - Not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Codex.
-  - Example description for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Codex needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+**Required fields:**
 
-Do not include any other fields in YAML frontmatter.
+- `name`: Hyphen-case skill name (`[a-z0-9-]+`, max 64 chars). Must match the skill folder name.
+- `description`: Primary triggering mechanism (max 1024 chars, no angle brackets).
+  - Include both what the skill does and specific triggers/contexts for when to use it.
+  - Include all "when to use" information here — not in the body. The body is only loaded after triggering, so "When to Use This Skill" sections in the body are not helpful to Codex.
+  - Example for a `docx` skill: "Comprehensive document creation, editing, and analysis with support for tracked changes, comments, formatting preservation, and text extraction. Use when Codex needs to work with professional documents (.docx files) for: (1) Creating new documents, (2) Modifying or editing content, (3) Working with tracked changes, (4) Adding comments, or any other document tasks"
+
+**Optional spec fields:**
+
+- `license`: SPDX license identifier (e.g., `MIT`, `Apache-2.0`)
+- `allowed-tools`: List of tool names the skill is permitted to use
+- `metadata`: Freeform object for platform-specific extensions
+
+**OpenClaw metadata conventions** (nested under `metadata.openclaw`):
+
+```yaml
+metadata:
+  { "openclaw": { "emoji": "🔧", "os": ["darwin", "linux"], "requires": { "bins": ["tool-name"] }, "install": "brew install tool-name" } }
+```
+
+- `emoji` — display icon for the skill
+- `os` — platform constraints (array of `darwin`, `linux`, `win32`)
+- `requires.bins` — CLI binaries that must be on PATH
+- `requires.anyBins` — at least one of these binaries must be available
+- `install` — shell command to install dependencies
+
+**Validation rules:**
+- No keys outside `name`, `description`, `license`, `allowed-tools`, `metadata`
+- Name must be hyphen-case, no leading/trailing/consecutive hyphens
+- Description must not contain angle brackets
 
 ##### Body
 
@@ -368,3 +401,13 @@ After testing the skill, users may request improvements. Often this happens righ
 2. Notice struggles or inefficiencies
 3. Identify how SKILL.md or bundled resources should be updated
 4. Implement changes and test again
+
+### Session Tracking with entire.io
+
+If entire.io is enabled in the repo (`entire status`), use it during skill development to capture agent work as reviewable checkpoints.
+
+- **Before starting**: Run `entire status` to confirm tracking is active
+- **During development**: Each git commit creates a checkpoint with the full agent transcript
+- **Reviewing history**: Use `entire explain` to browse what the agent did, or `entire explain --checkpoint <id>` for details
+- **Safe iteration**: Use `entire rewind` to roll back to a previous checkpoint if a change went wrong — restores both code and agent context
+- **Design documentation**: Session transcripts captured by entire serve as living documentation of design decisions and rationale behind skill structure choices
